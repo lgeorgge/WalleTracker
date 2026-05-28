@@ -1,4 +1,5 @@
 using WalletTracker.Domain.Common;
+using WalletTracker.Domain.Common.Exceptions;
 
 namespace WalletTracker.Domain.Entities;
 
@@ -12,6 +13,12 @@ public class Wallet : BaseEntity
 
     public Wallet(string name, Guid userID)
     {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new DomainException("Wallet name cannot be empty.");
+
+        if (userID == Guid.Empty)
+            throw new DomainException("Invalid UserId.");
+
         Name = name;
         Balance = 0;
         UserID = userID;
@@ -21,12 +28,23 @@ public class Wallet : BaseEntity
 
     public void Deposit(decimal amount)
     {
+        if (amount <= 0)
+            throw new DomainException("Deposit amount must be greater than zero.");
+
+        if (amount > 10000)
+            throw new DomainException("Deposit amount cannot exceed 10,000.");
+
         Balance += amount;
         SetUpdatedAtUTC();
     }
 
     public void Withdraw(decimal amount)
     {
+        if (amount <= 0)
+            throw new DomainException("Withdrawal amount must be greater than zero.");
+
+        if (amount > Balance)
+            throw new DomainException("Insufficent balance.");
         Balance -= amount;
         SetUpdatedAtUTC();
     }
