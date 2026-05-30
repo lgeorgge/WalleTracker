@@ -1,6 +1,24 @@
+using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
+using WalletTracker.Application.Interfaces;
+using WalletTracker.Infrastructure.Data;
+using WalletTracker.Infrastructure.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+#region Services
+
+// WalletDbContext
+builder.Services.AddDbContext<WalletDBContext>(Options =>
+    Options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
+
+// Generic Repo
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddControllers();
+builder.Services.AddOpenApi();
+
+#endregion
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -10,7 +28,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
+
+app.MapControllers();
 
 app.UseHttpsRedirection();
 

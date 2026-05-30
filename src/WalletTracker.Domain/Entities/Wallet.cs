@@ -9,19 +9,19 @@ public class Wallet : BaseEntity
     public decimal Balance { get; private set; }
 
     // Nav property
-    public Guid UserID { get; }
+    public Guid UserId { get; }
 
-    public Wallet(string name, Guid userID)
+    public Wallet(string name, Guid userId)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException("Wallet name cannot be empty.");
 
-        if (userID == Guid.Empty)
+        if (userId == Guid.Empty)
             throw new DomainException("Invalid UserId.");
 
         Name = name;
         Balance = 0;
-        UserID = userID;
+        UserId = userId;
     }
 
     private Wallet() { }
