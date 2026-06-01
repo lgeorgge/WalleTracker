@@ -14,16 +14,16 @@ public class UsersController(IRepository<User> userRepository, IUnitOfWork unitO
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
-        return Ok(await _userRepository.GetAllAsync());
+        return Ok(await _userRepository.GetAllAsync(cancellationToken));
     }
 
     [HttpGet("email/{email}")]
-    public async Task<IActionResult> GetByEmail(string email)
+    public async Task<IActionResult> GetByEmail(string email, CancellationToken cancellationToken)
     {
         var emailSpec = new UserByEmailSpecification(email);
-        var user = await _userRepository.FindFirstOrDefaultAsync(emailSpec);
+        var user = await _userRepository.FindFirstOrDefaultAsync(emailSpec, cancellationToken);
         if (user is null)
         {
             return NotFound();
