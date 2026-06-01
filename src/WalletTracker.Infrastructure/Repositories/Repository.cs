@@ -19,7 +19,6 @@ public class Repository<T> : IRepository<T>
     public async Task AddAsync(T entity)
     {
         await _dbSet.AddAsync(entity);
-        await _walletDBContext.SaveChangesAsync();
     }
 
     public async Task<IReadOnlyList<T>> GetAllAsync()

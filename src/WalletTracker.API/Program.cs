@@ -15,6 +15,9 @@ builder.Services.AddDbContext<WalletDBContext>(Options =>
 
 // Generic Repo
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+// Unit of work
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
