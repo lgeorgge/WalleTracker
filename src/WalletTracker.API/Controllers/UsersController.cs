@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WalletTracker.Application.Interfaces;
+using WalletTracker.Application.Specifications.Users;
 using WalletTracker.Domain.Entities;
 
 namespace WalletTracker.API.Controllers;
@@ -16,6 +17,18 @@ public class UsersController(IRepository<User> userRepository, IUnitOfWork unitO
     public async Task<IActionResult> GetAll()
     {
         return Ok(await _userRepository.GetAllAsync());
+    }
+
+    [HttpGet("email/{email}")]
+    public async Task<IActionResult> GetByEmail(string email)
+    {
+        var emailSpec = new UserByEmailSpecification(email);
+        var user = await _userRepository.FindFirstOrDefaultAsync(emailSpec);
+        if (user is null)
+        {
+            return NotFound();
+        }
+        return Ok(user);
     }
 
     [HttpPost]

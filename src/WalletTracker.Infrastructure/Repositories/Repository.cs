@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using WalletTracker.Application.Interfaces;
+using WalletTracker.Application.Specifications;
 using WalletTracker.Infrastructure.Data;
+using WalletTracker.Infrastructure.Specifications;
 
 namespace WalletTracker.Infrastructure.Repositories;
 
@@ -39,5 +41,11 @@ public class Repository<T> : IRepository<T>
     public void Remove(T entity)
     {
         _dbSet.Remove(entity);
+    }
+
+    public Task<T?> FindFirstOrDefaultAsync(ISpecification<T> specification)
+    {
+        var evaluatedQuery = SpecEvaluator.GetQuery(_dbSet, specification);
+        return evaluatedQuery.FirstOrDefaultAsync();
     }
 }
