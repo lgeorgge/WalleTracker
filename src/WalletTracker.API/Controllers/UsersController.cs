@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using WalletTracker.Application.Common.Pagination;
 using WalletTracker.Application.Features.Users;
 using WalletTracker.Application.Interfaces;
 using WalletTracker.Application.Specifications.Users;
@@ -21,12 +22,23 @@ public class UsersController(IRepository<User> userRepository, IUnitOfWork unitO
     )
     {
         var usersSpec = new UsersSpecification(parameters);
+        var users = await _userRepository.ListAsync(usersSpec, cancellationToken);
+        var count = await _userRepository.CountAsync(usersSpec, cancellationToken);
+
+        var totalPages = (int)Math.Ceiling((double)count / parameters.PageSize);
+
+        var usersResponse = users
+            .Select(U => new UserResponse(U.Id, $"{U.FirstName} {U.LastName}", U.Email))
+            .ToList();
+
         return Ok(
-            new
-            {
-                Users = await _userRepository.ListAsync(usersSpec, cancellationToken),
-                Count = await _userRepository.CountAsync(usersSpec, cancellationToken),
-            }
+            new PagedResponse<UserResponse>(
+                parameters.Page,
+                parameters.PageSize,
+                count,
+                totalPages,
+                usersResponse
+            )
         );
     }
 

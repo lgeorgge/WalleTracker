@@ -1,10 +1,22 @@
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using Serilog;
 using WalletTracker.Application.Interfaces;
 using WalletTracker.Infrastructure.Data;
 using WalletTracker.Infrastructure.Repositories;
 
+// Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss}] {Message:lj}{NewLine}")
+    .CreateLogger();
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Logger
+builder.Host.UseSerilog();
 
 #region Services
 
@@ -32,6 +44,9 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
+    app.UseSerilogRequestLogging(L =>
+        L.MessageTemplate = "{RequestMethod} {RequestPath} => {StatusCode} in {Elapsed:0.0000} ms"
+    );
 }
 
 app.MapControllers();
