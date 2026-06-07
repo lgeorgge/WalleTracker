@@ -26,6 +26,9 @@ public class User : BaseEntity
         if (string.IsNullOrWhiteSpace(passwordHash))
             throw new DomainException("Password hash cannot be empty.");
 
+        CreatedAtUTC = DateTime.UtcNow;
+        UpdatedAtUTC = null;
+
         FirstName = firstName.Trim();
         LastName = lastName.Trim();
         Email = email.Trim().ToLower();

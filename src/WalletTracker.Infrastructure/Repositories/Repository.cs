@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using WalletTracker.Application.Interfaces;
 using WalletTracker.Application.Specifications;
@@ -24,12 +25,16 @@ public class Repository<T> : IRepository<T>
         await _dbSet.AddAsync(entity, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<T>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<T>> ListAsync(
+        ISpecification<T> specification,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await _dbSet.ToListAsync();
+        var evaluatedQuery = SpecEvaluator.GetQuery(_dbSet, specification);
+        return await evaluatedQuery.ToListAsync(cancellationToken);
     }
 
-    public async Task<T>? GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _dbSet.FindAsync(id, cancellationToken);
     }
@@ -44,12 +49,30 @@ public class Repository<T> : IRepository<T>
         _dbSet.Remove(entity);
     }
 
-    public Task<T?> FindFirstOrDefaultAsync(
+    public async Task<T?> FindFirstOrDefaultAsync(
         ISpecification<T> specification,
         CancellationToken cancellationToken = default
     )
     {
         var evaluatedQuery = SpecEvaluator.GetQuery(_dbSet, specification);
-        return evaluatedQuery.FirstOrDefaultAsync();
+        return await evaluatedQuery.FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public Task<T?> FindSingleOrDefaultAsync(
+        ISpecification<T> specification,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var query = SpecEvaluator.GetQuery(_dbSet, specification);
+        return query.SingleOrDefaultAsync(cancellationToken);
+    }
+
+    public Task<int> CountAsync(
+        ISpecification<T> specification,
+        CancellationToken cancellationToken
+    )
+    {
+        var evaluatedQuery = SpecEvaluator.GetCountQuery(_dbSet, specification);
+        return evaluatedQuery.CountAsync(cancellationToken);
     }
 }

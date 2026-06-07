@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using WalletTracker.Application.Features.Users;
 using WalletTracker.Application.Interfaces;
 using WalletTracker.Application.Specifications.Users;
 using WalletTracker.Domain.Entities;
@@ -14,9 +15,19 @@ public class UsersController(IRepository<User> userRepository, IUnitOfWork unitO
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     [HttpGet]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    public async Task<IActionResult> List(
+        [FromQuery] UserQueryParameters parameters,
+        CancellationToken cancellationToken
+    )
     {
-        return Ok(await _userRepository.GetAllAsync(cancellationToken));
+        var usersSpec = new UsersSpecification(parameters);
+        return Ok(
+            new
+            {
+                Users = await _userRepository.ListAsync(usersSpec, cancellationToken),
+                Count = await _userRepository.CountAsync(usersSpec, cancellationToken),
+            }
+        );
     }
 
     [HttpGet("email/{email}")]
@@ -34,7 +45,7 @@ public class UsersController(IRepository<User> userRepository, IUnitOfWork unitO
     [HttpPost]
     public async Task<IActionResult> Create()
     {
-        var user = new User("George", "Sherif", "george@test.com", "hashed-password");
+        var user = new User("George", "Sherif", "georgesheruf123@gmail.com", "hashed-password");
 
         await _userRepository.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();
