@@ -1,6 +1,9 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
+using WalletTracker.Application.Features.Users;
 using WalletTracker.Application.Interfaces;
 using WalletTracker.Infrastructure.Data;
 using WalletTracker.Infrastructure.Repositories;
@@ -20,6 +23,7 @@ builder.Host.UseSerilog();
 
 #region Services
 
+
 // WalletDbContext
 builder.Services.AddDbContext<WalletDBContext>(Options =>
     Options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -31,6 +35,9 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 // Unit of work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddControllers();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddOpenApi();
 
 #endregion

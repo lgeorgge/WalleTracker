@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WalletTracker.Application.Common.Pagination;
 using WalletTracker.Application.Features.Users;
@@ -42,6 +43,17 @@ public class UsersController(IRepository<User> userRepository, IUnitOfWork unitO
         );
     }
 
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
+    {
+        var user = await _userRepository.GetByIdAsync(id, cancellationToken);
+        if (user is null)
+        {
+            return NotFound();
+        }
+        return Ok(new UserResponse(user.Id, $"{user.FirstName} {user.LastName}", user.Email));
+    }
+
     [HttpGet("email/{email}")]
     public async Task<IActionResult> GetByEmail(string email, CancellationToken cancellationToken)
     {
@@ -55,13 +67,27 @@ public class UsersController(IRepository<User> userRepository, IUnitOfWork unitO
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create()
+    public async Task<IActionResult> Create(
+        CreateUserRequest request,
+        CancellationToken cancellationToken
+    )
     {
-        var user = new User("George", "Sherif", "georgesheruf123@gmail.com", "hashed-password");
+        var checkEmail = await _userRepository.FindSingleOrDefaultAsync(
+            new UserByEmailSpecification(request.Email),
+            cancellationToken
+        );
+        if (checkEmail != null)
+            return Conflict(new { Message = "A user with this email already exists." });
 
-        await _userRepository.AddAsync(user);
-        await _unitOfWork.SaveChangesAsync();
+        var user = new User(request.FirstName, request.LastName, request.Email, "hashed");
 
-        return Ok(user);
+        await _userRepository.AddAsync(user, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = user.Id },
+            new UserResponse(user.Id, $"{user.FirstName} {user.LastName}", user.Email)
+        );
     }
 }
