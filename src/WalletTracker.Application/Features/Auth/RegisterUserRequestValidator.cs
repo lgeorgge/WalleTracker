@@ -1,10 +1,11 @@
 using FluentValidation;
+using WalletTracker.Application.Features.Auth;
 
-namespace WalletTracker.Application.Features.Users;
+namespace WalletTracker.Application.Features.Auth;
 
-public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>
+public class RegisterUserRequestValidator : AbstractValidator<RegisterUserRequest>
 {
-    public CreateUserRequestValidator()
+    public RegisterUserRequestValidator()
     {
         RuleFor(U => U.FirstName).MaximumLength(100).NotEmpty();
         RuleFor(U => U.LastName).MaximumLength(100).NotEmpty();

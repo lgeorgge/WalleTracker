@@ -66,28 +66,26 @@ public class UsersController(IRepository<User> userRepository, IUnitOfWork unitO
         return Ok(user);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Create(
-        CreateUserRequest request,
-        CancellationToken cancellationToken
-    )
-    {
-        var checkEmail = await _userRepository.FindSingleOrDefaultAsync(
-            new UserByEmailSpecification(request.Email),
-            cancellationToken
-        );
-        if (checkEmail != null)
-            return Conflict(new { Message = "A user with this email already exists." });
+    // [HttpPost]
+    // public async Task<IActionResult> Create(
+    //     CreateUserRequest request,
+    //     CancellationToken cancellationToken
+    // )
+    // {
+    //     var checkEmail = await _userRepository.FindSingleOrDefaultAsync(
+    //         new UserByEmailSpecification(request.Email),
+    //         cancellationToken
+    //     );
+    //     if (checkEmail != null)
+    //         return Conflict(new { Message = "A user with this email already exists." });
 
-        var user = new User(request.FirstName, request.LastName, request.Email, "hashed");
+    //     var user = new User(request.FirstName, request.LastName, request.Email, "hashed");
 
-        await _userRepository.AddAsync(user, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    //     await _userRepository.AddAsync(user, cancellationToken);
+    //     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = user.Id },
-            new UserResponse(user.Id, $"{user.FirstName} {user.LastName}", user.Email)
-        );
-    }
+    //     return CreatedAtAction(nameof(GetById), new { id = user.Id },
+    //         new UserResponse(user.Id, $"{user.FirstName} {user.LastName}", user.Email)
+    //     );
+    // }
 }

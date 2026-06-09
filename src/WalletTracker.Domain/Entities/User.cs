@@ -8,7 +8,7 @@ public class User : BaseEntity
     public string FirstName { get; }
     public string LastName { get; }
     public string Email { get; }
-    public string PasswordHash { get; }
+    public string PasswordHash { get; private set; }
 
     private User() { }
 
@@ -33,5 +33,14 @@ public class User : BaseEntity
         LastName = lastName.Trim();
         Email = email.Trim().ToLower();
         PasswordHash = passwordHash;
+    }
+
+    public void SetPasswordHash(string passwordHash)
+    {
+        if (string.IsNullOrWhiteSpace(passwordHash))
+            throw new DomainException("Password hash cannot be empty.");
+
+        PasswordHash = passwordHash;
+        UpdatedAtUTC = DateTime.UtcNow;
     }
 }

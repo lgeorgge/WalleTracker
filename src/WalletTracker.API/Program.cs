@@ -1,10 +1,15 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
+using WalletTracker.Application.Common.Auth;
+using WalletTracker.Application.Features.Auth;
 using WalletTracker.Application.Features.Users;
 using WalletTracker.Application.Interfaces;
+using WalletTracker.Domain.Entities;
+using WalletTracker.Infrastructure.Auth;
 using WalletTracker.Infrastructure.Data;
 using WalletTracker.Infrastructure.Repositories;
 
@@ -36,10 +41,17 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddControllers();
 
-builder.Services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
+// Jwt settings
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT"));
+builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterUserRequestValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddOpenApi();
 
+// Password Managers
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>(); // microsoft's
+builder.Services.AddScoped<IPasswordService, PasswordService>(); // our wrapper
 #endregion
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
