@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WalletTracker.Application.Common.Pagination;
@@ -9,15 +10,16 @@ using WalletTracker.Domain.Entities;
 namespace WalletTracker.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/users")]
 public class UsersController(IRepository<User> userRepository, IUnitOfWork unitOfWork)
     : ControllerBase
 {
     private readonly IRepository<User> _userRepository = userRepository;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
+    [Authorize]
     [HttpGet]
-    public async Task<IActionResult> List(
+    public async Task<ActionResult<PagedResponse<UserResponse>>> List(
         [FromQuery] UserQueryParameters parameters,
         CancellationToken cancellationToken
     )
@@ -65,27 +67,4 @@ public class UsersController(IRepository<User> userRepository, IUnitOfWork unitO
         }
         return Ok(user);
     }
-
-    // [HttpPost]
-    // public async Task<IActionResult> Create(
-    //     CreateUserRequest request,
-    //     CancellationToken cancellationToken
-    // )
-    // {
-    //     var checkEmail = await _userRepository.FindSingleOrDefaultAsync(
-    //         new UserByEmailSpecification(request.Email),
-    //         cancellationToken
-    //     );
-    //     if (checkEmail != null)
-    //         return Conflict(new { Message = "A user with this email already exists." });
-
-    //     var user = new User(request.FirstName, request.LastName, request.Email, "hashed");
-
-    //     await _userRepository.AddAsync(user, cancellationToken);
-    //     await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-    //     return CreatedAtAction(nameof(GetById), new { id = user.Id },
-    //         new UserResponse(user.Id, $"{user.FirstName} {user.LastName}", user.Email)
-    //     );
-    // }
 }

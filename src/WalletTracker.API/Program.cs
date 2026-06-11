@@ -1,7 +1,10 @@
+using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using Serilog;
 using WalletTracker.Application.Common.Auth;
@@ -52,6 +55,26 @@ builder.Services.AddOpenApi();
 // Password Managers
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>(); // microsoft's
 builder.Services.AddScoped<IPasswordService, PasswordService>(); // our wrapper
+
+// Add Authentication and Authorization
+builder
+    .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(O =>
+    {
+        var settings = builder.Configuration.GetSection("JWT").Get<JwtSettings>();
+        O.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = true,
+            ValidateIssuer = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidAudience = settings!.Audience,
+            ValidIssuer = settings.Issuer,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.Key)),
+        };
+    });
+builder.Services.AddAuthorization();
+
 #endregion
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -68,8 +91,11 @@ if (app.Environment.IsDevelopment())
     );
 }
 
-app.MapControllers();
-
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
 
 app.Run();
