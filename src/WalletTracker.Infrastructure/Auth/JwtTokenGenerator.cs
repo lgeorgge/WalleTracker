@@ -27,6 +27,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         {
             new("sub", user.Id.ToString()),
             new(ClaimTypes.Email, user.Email),
+            new(ClaimTypes.Role, user.UserRole.ToString()),
         };
 
         // Generate security key

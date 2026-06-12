@@ -9,5 +9,6 @@ public class LoginRequestValidator : AbstractValidator<User>
     {
         RuleFor(U => U.Email).NotEmpty().MaximumLength(100);
         RuleFor(U => U.PasswordHash).NotEmpty();
+        RuleFor(U => U.UserRole).IsInEnum();
     }
 }

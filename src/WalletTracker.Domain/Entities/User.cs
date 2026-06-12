@@ -1,5 +1,6 @@
 using WalletTracker.Domain.Common;
 using WalletTracker.Domain.Common.Exceptions;
+using WalletTracker.Domain.Enums;
 
 namespace WalletTracker.Domain.Entities;
 
@@ -10,9 +11,17 @@ public class User : BaseEntity
     public string Email { get; }
     public string PasswordHash { get; private set; }
 
+    public UserRole UserRole { get; }
+
     private User() { }
 
-    public User(string firstName, string lastName, string email, string passwordHash)
+    public User(
+        string firstName,
+        string lastName,
+        string email,
+        string passwordHash,
+        UserRole userRole
+    )
     {
         if (string.IsNullOrWhiteSpace(firstName))
             throw new DomainException("First name cannot be empty.");
@@ -33,6 +42,7 @@ public class User : BaseEntity
         LastName = lastName.Trim();
         Email = email.Trim().ToLower();
         PasswordHash = passwordHash;
+        UserRole = userRole;
     }
 
     public void SetPasswordHash(string passwordHash)

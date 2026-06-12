@@ -54,7 +54,8 @@ public class AuthController : ControllerBase
                 registerUserRequest.FirstName,
                 registerUserRequest.LastName,
                 registerUserRequest.Email,
-                "TEMP_PASSWORD"
+                "TEMP_PASSWORD",
+                registerUserRequest.UserRole
             );
 
             var hashedPassword = _passwordService.Hash(user, registerUserRequest.Password);
@@ -104,8 +105,14 @@ public class AuthController : ControllerBase
     {
         var Id = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var email = User.FindFirstValue(ClaimTypes.Email);
+        var role = User.FindFirstValue(ClaimTypes.Role);
 
-        var response = new { Id, email };
+        var response = new
+        {
+            Id,
+            email,
+            role,
+        };
         return Ok(response);
     }
 }
