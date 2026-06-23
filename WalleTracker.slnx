@@ -1,8 +1,9 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/WalletTracker.API/WalletTracker.API.csproj" />
-    <Project Path="src/WalletTracker.Application/WalletTracker.Application.csproj" />
-    <Project Path="src/WalletTracker.Domain/WalletTracker.Domain.csproj" />
-    <Project Path="src/WalletTracker.Infrastructure/WalletTracker.Infrastructure.csproj" />
+    <Project Path="src/WalletTracker.API/WalletTracker.API.csproj"/>
+    <Project Path="src/WalletTracker.Application/WalletTracker.Application.csproj"/>
+    <Project Path="src/WalletTracker.Domain/WalletTracker.Domain.csproj"/>
+    <Project Path="src/WalletTracker.Infrastructure/WalletTracker.Infrastructure.csproj"/>
+    <Project Path="src/Playground/Playground.csproj"/>
   </Folder>
 </Solution>

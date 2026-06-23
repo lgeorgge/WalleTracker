@@ -1,12 +1,9 @@
-using System.Security.Claims;
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using WalletTracker.Application.Features.Auth;
 using WalletTracker.Application.Interfaces;
 using WalletTracker.Application.Specifications.Users;
+using WalletTracker.Domain.Common.Exceptions;
 using WalletTracker.Domain.Entities;
 
 namespace WalletTracker.API.Controllers;
@@ -69,9 +66,9 @@ public class AuthController : ControllerBase
 
             return Ok(response);
         }
-        catch (ValidationException)
+        catch (DomainException)
         {
-            return ValidationProblem("Error creating a new user.");
+            throw new DomainException("Error creating new user.");
         }
     }
 
@@ -81,17 +78,15 @@ public class AuthController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        var user = await _userRepository.FindSingleOrDefaultAsync(
-            new UserByEmailSpecification(loginRequest.Email),
-            cancellationToken
-        );
-
-        if (user is null)
-            return Unauthorized(new { Message = "Invalid email or password." });
+        var user =
+            await _userRepository.FindSingleOrDefaultAsync(
+                new UserByEmailSpecification(loginRequest.Email),
+                cancellationToken
+            ) ?? throw new NotFoundException("This user is not registered.");
 
         if (!_passwordService.Verify(user, loginRequest.Password, user.PasswordHash))
         {
-            return Unauthorized(new { Message = "Invalid email or password." });
+            throw new UnauthorizedException("Invalid email or password.");
         }
 
         var response = _jwtTokenGenerator.GenerateToken(user);
@@ -101,17 +96,13 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpGet("me")]
-    public IActionResult GetMe()
+    public IActionResult GetMe([FromServices] ICurrentUser currentUser)
     {
-        var Id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var email = User.FindFirstValue(ClaimTypes.Email);
-        var role = User.FindFirstValue(ClaimTypes.Role);
-
         var response = new
         {
-            Id,
-            email,
-            role,
+            currentUser.Id,
+            currentUser.Email,
+            currentUser.UserRole,
         };
         return Ok(response);
     }

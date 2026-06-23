@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using Serilog;
+using WalletTracker.API.Exceptions;
 using WalletTracker.Application.Common.Auth;
 using WalletTracker.Application.Features.Auth;
 using WalletTracker.Application.Features.Users;
@@ -75,6 +76,13 @@ builder
     });
 builder.Services.AddAuthorization();
 
+// Add current user
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+
+// Add exception handler
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 #endregion
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -92,6 +100,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Use exception handler( NOTE : it should be early in the pipeline)
+app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();
