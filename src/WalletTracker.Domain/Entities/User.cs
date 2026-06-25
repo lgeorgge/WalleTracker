@@ -6,12 +6,16 @@ namespace WalletTracker.Domain.Entities;
 
 public class User : BaseEntity
 {
+    private readonly List<Wallet> _wallets = [];
+
     public string FirstName { get; }
     public string LastName { get; }
     public string Email { get; }
     public string PasswordHash { get; private set; }
 
     public UserRole UserRole { get; }
+
+    public IReadOnlyCollection<Wallet> Wallets => _wallets;
 
     private User() { }
 

@@ -5,11 +5,12 @@ namespace WalletTracker.Domain.Entities;
 
 public class Wallet : BaseEntity
 {
-    public string Name { get; }
+    public string Name { get; private set; }
     public decimal Balance { get; private set; }
 
     // Nav property
     public Guid UserId { get; }
+    public User User { get; }
 
     public Wallet(string name, Guid userId)
     {
@@ -31,9 +32,6 @@ public class Wallet : BaseEntity
         if (amount <= 0)
             throw new DomainException("Deposit amount must be greater than zero.");
 
-        if (amount > 10000)
-            throw new DomainException("Deposit amount cannot exceed 10,000.");
-
         Balance += amount;
         SetUpdatedAtUTC();
     }
@@ -46,6 +44,15 @@ public class Wallet : BaseEntity
         if (amount > Balance)
             throw new DomainException("Insufficent balance.");
         Balance -= amount;
+        SetUpdatedAtUTC();
+    }
+
+    public void Rename(string newName)
+    {
+        if (string.IsNullOrWhiteSpace(newName))
+            throw new DomainException("Wallet name cannot be empty.");
+
+        Name = newName.Trim();
         SetUpdatedAtUTC();
     }
 }
