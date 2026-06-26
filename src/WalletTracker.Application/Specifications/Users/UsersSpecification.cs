@@ -14,10 +14,11 @@ public class UsersSpecification : BaseSpecification<User>
         if (!string.IsNullOrWhiteSpace(userQueryParameters.Search))
         {
             string keyword = userQueryParameters.Search;
-            Criteria = U =>
+            AddCriteria(U =>
                 U.FirstName.Contains(keyword)
                 || U.LastName.Contains(keyword)
-                || U.Email.Contains(keyword);
+                || U.Email.Contains(keyword)
+            );
         }
     }
 }

@@ -14,7 +14,10 @@ public static class SpecEvaluator
         // Criteria
         if (specification.Criteria is not null)
         {
-            query = query.Where(specification.Criteria);
+            foreach (var criteria in specification.Criteria)
+            {
+                query = query.Where(criteria);
+            }
         }
 
         // OrderBy
@@ -47,7 +50,10 @@ public static class SpecEvaluator
 
         if (specification.Criteria is not null)
         {
-            query = query.Where(specification.Criteria);
+            foreach (var criteria in specification.Criteria)
+            {
+                query = query.Where(criteria);
+            }
         }
 
         return query;

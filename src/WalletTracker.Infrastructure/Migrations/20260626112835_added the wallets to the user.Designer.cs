@@ -9,10 +9,10 @@ using WalletTracker.Infrastructure.Data;
 
 #nullable disable
 
-namespace WalletTracker.Infrastructure.src.WalletTracker.Infrastructure.Migrations
+namespace WalletTracker.Infrastructure.Migrations
 {
     [DbContext(typeof(WalletDBContext))]
-    [Migration("20260625111151_added the wallets to the user")]
+    [Migration("20260626112835_added the wallets to the user")]
     partial class addedthewalletstotheuser
     {
         /// <inheritdoc />
@@ -124,6 +124,9 @@ namespace WalletTracker.Infrastructure.src.WalletTracker.Infrastructure.Migratio
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 

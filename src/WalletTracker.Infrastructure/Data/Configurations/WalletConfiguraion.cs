@@ -21,5 +21,8 @@ public class WalletConfiguraion : IEntityTypeConfiguration<Wallet>
             .WithMany(x => x.Wallets)
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(x => x.Name).IsUnique();
+        builder.HasIndex(x => x.UserId);
     }
 }

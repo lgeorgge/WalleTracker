@@ -122,6 +122,9 @@ namespace WalletTracker.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Wallets");

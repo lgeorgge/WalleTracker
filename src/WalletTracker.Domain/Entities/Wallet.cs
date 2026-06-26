@@ -23,6 +23,7 @@ public class Wallet : BaseEntity
         Name = name;
         Balance = 0;
         UserId = userId;
+        CreatedAtUTC = DateTime.UtcNow;
     }
 
     private Wallet() { }

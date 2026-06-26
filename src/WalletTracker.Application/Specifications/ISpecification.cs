@@ -5,7 +5,7 @@ namespace WalletTracker.Application.Specifications;
 public interface ISpecification<T>
 {
     // Criteria
-    Expression<Func<T, bool>>? Criteria { get; }
+    List<Expression<Func<T, bool>>>? Criteria { get; }
 
     // OrderBy
     Expression<Func<T, object>>? OrderBy { get; }
